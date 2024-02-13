@@ -50,7 +50,7 @@ while(TRUE){
   x <- x+1
 }
 
-drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75, gotfor2 = FALSE){
+drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75, gofor2 = FALSE){
   #browser()
   state <- list()
   state$down <- 1
@@ -131,7 +131,7 @@ table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 7)))/10000
 
 simOT <- function(){
   a <- drive_sim_MS(goforit = FALSE, deficit = 0) 
-  b <- drive_sim_MS(goforit = FALSE, deficit = a) 
+  b <- drive_sim_MS(goforit = FALSE, deficit = a, gofor2 = FALSE) 
   if (a > b){return("A1")} else if (a < b) {return("B2")} else {
     a <- 0
     b <- 0
