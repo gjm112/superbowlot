@@ -50,12 +50,12 @@ while(TRUE){
   x <- x+1
 }
 
-drive_sim_MS <- function(goforit = FALSE,deficit = 0){
+drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75){
   #browser()
   state <- list()
   state$down <- 1
   state$togo <- 10
-  state$topaydirt <- 75
+  state$topaydirt <- yards_to_ez
   while(TRUE){
     #y <- rgamma(1,9/100,3/100) 
     y <- sample(yards,1)
@@ -143,7 +143,7 @@ simOT <- function(){
   }
 }
 
-nsim<- 100000
+nsim<- 10000
 res <- replicate(nsim,simOT())
 
 table((substring(res,1, 1)))/nsim
