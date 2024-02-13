@@ -129,22 +129,21 @@ table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 7)))/10000
 simOT <- function(){
   a <- drive_sim_MS(goforit = FALSE, deficit = 0) 
   b <- drive_sim_MS(goforit = FALSE, deficit = a) 
-  if (a > b){return("A")} else if (a < b) {return("B")} else {
+  if (a > b){return("A1")} else if (a < b) {return("B2")} else {
     a <- 0
     b <- 0
-    i <- 0
+    i <- 2
       while (TRUE){
-        i <- i + 1
+        i <- i + 1 
         score <- drive_sim_MS(goforit = FALSE, deficit = 0)
         if (score > 0){
-          if (i %% 2 == 1){return("A")} else {return("B")}
+          if (i %% 2 == 1){return(paste0("A",i))} else {return(paste0("B",i))}
         }
           }  
   }
 }
 
-table(replicate(50000,simOT()))/50000
+res <- replicate(10000,simOT())
 
-
-
+table(as.numeric(substring(res,2, nchar(res))))
 
