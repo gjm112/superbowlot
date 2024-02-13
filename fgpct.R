@@ -1,6 +1,9 @@
 library(tidyverse)
 #Data: https://github.com/nflverse/nflverse-data/releases/tag/pbp
 pbp2023 <- read.csv("./play_by_play_2023.csv")
+yards <- pbp2023 %>% filter(play_type %in% c("pass","run")) %>% pull(yards_gained)
+
+
 fg <- pbp2023 %>% filter(season_type == "REG" & play_type == "field_goal") %>% select(kick_distance, field_goal_result) %>% mutate(made = field_goal_result == "made")
 
 fgmod <- glm(made ~ kick_distance, data = fg, family = "binomial")
