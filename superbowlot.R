@@ -50,7 +50,7 @@ while(TRUE){
   x <- x+1
 }
 
-drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75){
+drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75, gotfor2 = FALSE){
   #browser()
   state <- list()
   state$down <- 1
@@ -62,8 +62,11 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75){
     
     if (state$down <= 3){
       if (y >= state$topaydirt){
-        return(7)
-      } else if (y >= state$togo){
+        
+        if (gofor2) {return(6 + 2*rbinom(1,1,0.5))} else {return(7)}
+      
+        
+        } else if (y >= state$togo){
         state$down <- 1
         state$topaydirt <- state$topaydirt - y
         state$togo <- min(10,state$topaydirt)
@@ -74,7 +77,7 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75){
       }
     } else if (deficit == 7) {
       if (y >= state$topaydirt){
-        return(7)
+        if (gofor2) {return(6 + 2*rbinom(1,1,0.5))} else {return(7)}
       } else if (y >= state$togo) {
         state$down <- 1
         state$topaydirt <- state$topaydirt - y
@@ -85,7 +88,7 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75){
     } else if (deficit == 3) {
       if (goforit | state$topaydirt > 40){
         if (y >= state$topaydirt){
-          return(7)
+          if (gofor2) {return(6 + 2*rbinom(1,1,0.5))} else {return(7)}
         } else if (y >= state$togo) {
           state$down <- 1
           state$topaydirt <- state$topaydirt - y
@@ -99,7 +102,7 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75){
     } else {
       if (goforit){
         if (y >= state$topaydirt){
-          return(7)
+          if (gofor2) {return(6 + 2*rbinom(1,1,0.5))} else {return(7)}
         } else if (y >= state$togo) {
           state$down <- 1
           state$topaydirt <- state$topaydirt - y
