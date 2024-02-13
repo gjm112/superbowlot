@@ -143,7 +143,9 @@ simOT <- function(){
   }
 }
 
-res <- replicate(10000,simOT())
+nsim<- 100000
+res <- replicate(nsim,simOT())
 
-table(as.numeric(substring(res,2, nchar(res))))
+table((substring(res,1, 1)))/nsim
+plot(table(as.numeric(substring(res,2, nchar(res)))), col = c("red","blue"))
 
