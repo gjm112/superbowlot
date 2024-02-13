@@ -121,12 +121,15 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0, yards_to_ez = 75, gofor2 =
 
 drive_sim_MS(goforit = TRUE, deficit = 0)
 
+table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 0, gofor2 = TRUE)))/10000
+table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 3, gofor2 = TRUE)))/10000
+table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 7, gofor2 = TRUE)))/10000
 table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 0)))/10000
 table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 3)))/10000
 table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 7)))/10000
-table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 0)))/10000
-table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 3)))/10000
-table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 7)))/10000
+table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 0, gofor2 = TRUE)))/10000
+table(replicate(10000,drive_sim_MS(goforit = FALSE, deficit = 3, gofor2 = TRUE)))/10000
+table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 7, gofor2 = TRUE)))/10000
 
 
 simOT <- function(){
