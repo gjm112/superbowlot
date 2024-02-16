@@ -177,7 +177,7 @@ drive_sim_MS(goforit = FALSE, deficit = 0)
 simOT <- function(goforit = FALSE, gofor2 = FALSE){ # Coach's decision to Go For it/Go For 2
   a <- drive_sim_MS(goforit = goforit, gofor2 = gofor2) 
   if (a$score == -2){return("B1")} else { # Team B scored a safety, Game Over!
-  b <- drive_sim_MS(goforit = goforit, deficit = a$score,  yards_to_ez = a$dist, gofor2 = case_when(a$score == 8 ~ TRUE, a$score == 6 ~ FALSE, TRUE ~ gofor2), SV=TRUE) 
+  b <- drive_sim_MS(goforit = goforit, deficit = a$score,  yards_to_ez = a$dist, gofor2 = case_when(a$score == 8 ~ TRUE, a$score == 6 ~ FALSE, TRUE ~ gofor2)) 
     # case_when() logic
     # If Team A has 8 points, Team B MUST go for 2
     # If Team A has 6 points, Team B will in all likelihood kick the PAT to win
