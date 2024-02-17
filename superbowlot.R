@@ -64,13 +64,10 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0,yards_to_ez = 75,gofor2 = F
     
     if (state$down <= 3){ # Simulating 1st, 2nd, or 3rd Down
       if (y >= state$topaydirt){ # Touchdown!!
-        if (gofor2) {
-          return(list(score = 6 + ifelse(SV,0,2*rbinom(1,1,0.4735)),
+          return(list(score = 6 + case_when(SV ~ 0, 
+                                            gofor2 ~ 2*rbinom(1,1,0.4735),
+                                            TRUE ~ rbinom(1,1,fgpct(33))),
                       dist = 75))
-        } else {
-          return(list(score = 6 + ifelse(SV,0,rbinom(1,1,fgpct(33))),
-                      dist = 75))
-        }
       } else if (state$topaydirt - y >= 100) { # Safety!!
         return(list(score = -2,dist = 75))
       } else if (y >= state$togo){ # First Down!!
@@ -84,13 +81,9 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0,yards_to_ez = 75,gofor2 = F
       }
     } else if (deficit >= 6) { # Have to Go For it on 4th Down
       if (y >= state$topaydirt){ # Touchdown!!
-        if (gofor2) {
-          return(list(score = 6 + 2*rbinom(1,1,0.4735),
-                      dist = 75))
-        } else {
-          return(list(score = 6 + rbinom(1,1,fgpct(33)),
-                      dist = 75))
-        }
+        return(list(score = 6 + case_when(gofor2 ~ 2*rbinom(1,1,0.4735),
+                                          TRUE ~ rbinom(1,1,fgpct(33))),
+                    dist = 75))
       } else if (state$topaydirt - y >= 100) { # Safety!!
         return(list(score = -2,dist = 75))
       } else if (y >= state$togo) { # First Down!!
@@ -126,13 +119,10 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0,yards_to_ez = 75,gofor2 = F
     } else {
       if (goforit){ # Choosing to go for it on 4th down
         if (y >= state$topaydirt){ # Touchdown!!
-          if (gofor2) {
-            return(list(score = 6 + ifelse(SV,0,2*rbinom(1,1,0.4735)),
-                        dist = 75))
-          } else {
-            return(list(score = 6 + ifelse(SV,0,rbinom(1,1,fgpct(33))),
-                        dist = 75))
-          }
+          return(list(score = 6 + case_when(SV ~ 0, 
+                                            gofor2 ~ 2*rbinom(1,1,0.4735),
+                                            TRUE ~ rbinom(1,1,fgpct(33))),
+                      dist = 75))
         } else if (state$topaydirt - y >= 100) { # Safety!!
           return(list(score = -2,dist = 75))
         } else if (y >= state$togo) { # First Down!!
@@ -145,16 +135,15 @@ drive_sim_MS <- function(goforit = FALSE,deficit = 0,yards_to_ez = 75,gofor2 = F
         }
       } else if (fgpct(state$topaydirt + 17) < 0.5) { # Punt
         p <- sample(punt,1)
-        if (state$topaydirt - p < 0){
-          dist <- 20
-        } else {
-          dist <- state$topaydirt - p
-        }
-        return(list(score = 0,dist = 100 - dist))
+        return(list(score = 0,dist = ifelse(state$topaydirt - p < 0,
+                                            20,
+                                            100 - (state$topaydirt - p))))
       } else { # Kick the Field Goal
         kick <- rbinom(1,1,fgpct(state$topaydirt + 17)) # Simulate the kick
         return(list(score = 3*kick,
-                    dist = ifelse(kick == 1,75,100 - (state$topaydirt - 7))))
+                    dist = ifelse(kick == 1,
+                                  75,
+                                  100 - (state$topaydirt - 7))))
         # If made, ball at 75, otherwise, ball at the spot of the kick
       }
     }
@@ -174,16 +163,29 @@ drive_sim_MS(goforit = FALSE, deficit = 0)
 # table(replicate(10000,drive_sim_MS(goforit = TRUE, deficit = 7, gofor2 = TRUE)$score))/10000
 
 
-simOT <- function(goforit = FALSE, gofor2 = FALSE){ # Coach's decision to Go For it/Go For 2
-  a <- drive_sim_MS(goforit = goforit, gofor2 = gofor2) 
-  if (a$score == -2){return("B1")} else { # Team B scored a safety, Game Over!
-  b <- drive_sim_MS(goforit = goforit, deficit = a$score,  yards_to_ez = a$dist, gofor2 = case_when(a$score == 8 ~ TRUE, a$score == 6 ~ FALSE, TRUE ~ gofor2)) 
+simOT <- function(start_yards = 75,goforit_A = FALSE,goforit_B = FALSE, gofor2_A= FALSE, gofor2_B = FALSE){ # Coach's decision to Go For it/Go For 2
+  a <- drive_sim_MS(goforit = goforit_A, 
+                    yards_to_ez = start_yards,
+                    gofor2 = gofor2_A)
+  if (a$score == -2){
+    return("B1") # Team B scored a safety, Game Over!
+  } else { 
+    b <- drive_sim_MS(goforit = goforit_B, 
+                      deficit = a$score,  
+                      yards_to_ez = a$dist, 
+                      gofor2 = case_when(a$score == 8 ~ TRUE, 
+                                         a$score == 6 ~ FALSE, 
+                                         TRUE ~ gofor2_B)) 
     # case_when() logic
     # If Team A has 8 points, Team B MUST go for 2
     # If Team A has 6 points, Team B will in all likelihood kick the PAT to win
     # If Team A has 7 points, Team B will make a coach's decision
     # Otherwise, PAT does not matter, a touchdown will win
-    if (a$score > b$score){return("A1")} else if (a$score < b$score) {return("B2")} else {
+    if (a$score > b$score){
+      return("A1")
+    } else if (a$score < b$score) {
+      return("B2")
+    } else {
       this_drive <- b
       i <- 2
       while (TRUE){
@@ -191,7 +193,11 @@ simOT <- function(goforit = FALSE, gofor2 = FALSE){ # Coach's decision to Go For
         last_drive <- this_drive
         # Go For 2 no longer matters, next team to score wins.
         # Assuming that, if a team is in field goal range, they will kick
-        this_drive <- drive_sim_MS(goforit = FALSE, deficit = 0, yards_to_ez = last_drive$dist, SV = TRUE)
+        this_drive <- drive_sim_MS(goforit = ifelse(i %% 2 == 1,
+                                                    goforit_A,
+                                                    goforit_B),
+                                   yards_to_ez = last_drive$dist, 
+                                   SV = TRUE)
         if (this_drive$score > 0){ # Team with the ball scores a TD
           if (i %% 2 == 1){
             return(paste0("A",i))
